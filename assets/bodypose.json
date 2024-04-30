@@ -1,0 +1,201 @@
+{
+  "keypoints": [
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "nose"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_eye"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_eye"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_ear"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_ear"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_shoulder"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_shoulder"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_elbow"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_elbow"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_wrist"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_wrist"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_hip"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_hip"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_knee"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_knee"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "left_ankle"
+    },
+    {
+      "y": 0,
+      "x": 0,
+      "score": 1,
+      "name": "right_ankle"
+    }
+  ],
+  "box": {
+    "yMin": 0,
+    "xMin": 0,
+    "yMax": 0,
+    "xMax": 0,
+    "width": 0,
+    "height": 0
+  },
+  "score": 1,
+  "id": 341,
+  "nose": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_eye": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_eye": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_ear": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_ear": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_shoulder": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_shoulder": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_elbow": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_elbow": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_wrist": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_wrist": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_hip": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_hip": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_knee": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_knee": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "left_ankle": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  },
+  "right_ankle": {
+    "x": 0,
+    "y": 0,
+    "score": 1
+  }
+}
