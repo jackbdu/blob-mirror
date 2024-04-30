@@ -6,6 +6,13 @@
  * https://instagram.com/jackbdu/
  */
 
+// https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+const params = new Proxy(new URLSearchParams(window.location.search), {
+  get: (searchParams, prop) => searchParams.get(prop),
+});
+if (params.width && parseInt(params.width) > 0) p5sketch.specs.outputWidth = params.width;
+if (params.height && parseInt(params.height) > 0) p5sketch.specs.outputHeight = params.height;
+
 // data.GUI
 // p5sketch.gui = new dat.GUI();
 // const tempOptions = {};
@@ -51,6 +58,7 @@ p5sketch.capturerSpecs = {
   numStartCaptureFrame: 2,
   // numTotalCaptureFrames: p5sketch.specs.loopFramesNum, // uncomment this line to capture canvas
 };
+
 // specify output dimensions
 //p5sketch.specs = {...p5sketch.specs, outputWidth: 1920, outputHeight: 1080 }; // 1080p horizontal
 // p5sketch.specs = {...p5sketch.specs, outputWidth: 1080, outputHeight: 1920 }; // 1080p vertical
