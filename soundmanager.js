@@ -67,7 +67,7 @@ class SoundManager {
     this.Tone.Transport.scheduleRepeat((time) => {
       if (this.destBpm !== this.Tone.Transport.bpm.value) {
         const rampTime = this.smoothness;
-        this.Tone.Transport.bpm.rampTo(this.destBpm, rampTime);
+        this.Tone.Transport.bpm.rampTo(this.destBpm, rampTime, time);
         //console.log(this.Tone.Transport.bpm.value);
       }
 
@@ -88,7 +88,7 @@ class SoundManager {
         const melodyMidi = this.melodyMidis[this.melodyMidiIndex];
         const melodyNote = this.Tone.Frequency(melodyMidi, "midi");
         const melodyNoteDuration = intervalDuration;
-        this.melodySynth.triggerAttackRelease(melodyNote, melodyNoteDuration);
+        this.melodySynth.triggerAttackRelease(melodyNote, melodyNoteDuration, time);
       }
 
       // play chord
