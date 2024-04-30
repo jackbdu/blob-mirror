@@ -40,6 +40,8 @@ class Ml5Manager {
     this.movementScores = [0];
     try {
       this.graphics = options?.graphics;
+      // use less pixel to increase performance
+      this.graphics.pixelDensity(1);
     } catch (e) {
       console.error(e);
     }
@@ -67,6 +69,7 @@ class Ml5Manager {
           const coord = {
             x: keypoint.x,
             y: keypoint.y,
+            intensity: keypoint.intensity,
           };
           coords.push(coord);
         }
@@ -97,7 +100,8 @@ class Ml5Manager {
     return keypoints;
   }
 
-  // only returning used properties
+  // returns { keypoints, box }
+  // normalized range [-0.5, 0.5]
   normalizeBodies(bodies) {
     const realWidth = this.graphics.width * this.graphics.pixelDensity();
     const realHeight = this.graphics.height * this.graphics.pixelDensity();
@@ -117,6 +121,7 @@ class Ml5Manager {
       normalizedBody.box["width"] = body.box["width"] / realWidth;
       normalizedBody.box["height"] = body.box["height"] / realHeight;
       normalizedBodies.push(normalizedBody);
+      //console.log(realHeight, body.box["height"]);
     }
     return normalizedBodies;
   }
@@ -125,7 +130,6 @@ class Ml5Manager {
     if (bodies.length < 1) {
       // const placeholderBodies = this.placeholderBodies.getNextFrame();
       // bodies = JSON.parse(JSON.stringify(placeholderBodies));
-
       bodies = JSON.parse(JSON.stringify(this.placeholderBodies));
     } else {
       bodies = this.normalizeBodies(bodies);
@@ -133,29 +137,13 @@ class Ml5Manager {
     if (bodies.length > 0 && this.bodies.length > 0) {
       // console.log(bodies);
       this.pbodies = this.bodies;
-      // this.bodies = bodies;
       this.bodies = this.smoothBodies(this.pbodies, bodies, this.smoothness);
     } else if (bodies.length > 0 && !this.bodies.length > 0) {
       this.pbodies = bodies;
-      // this.bodies = bodies;
-      this.bodies = this.smoothBodies(this.pbodies, bodies, this.smoothness);
+      this.bodies = bodies;
     }
 
-    //     // Press key to record
-    //     if (p5sketch.keyIsPressed) {
-    //       this.recordedBodies.push(this.bodies);
-    //       // console.log('recording');
-    //     }
-
-    //     // Press mouse to init and clear recorded bodies
-    //     if (p5sketch.mouseIsPressed) {
-    //       if (this.recordedBodies?.length > 0) {
-    //         console.log('saving');
-    //         p5sketch.saveJSON(this.recordedBodies, 'bodypose.json');
-    //       }
-    //       console.log('clearing');
-    //       this.recordedBodies = [];
-    //     }
+    //this.recordBodies(this.bodies);
 
     // console.log(bodies);
     for (let body of this.bodies) {
@@ -201,12 +189,27 @@ class Ml5Manager {
   smoothData(prevData, newData, prevScore, newScore, smoothness) {
     return (prevData * smoothness * prevScore + newData * (1 - smoothness) * newScore) / ((prevScore + newScore) / 2);
   }
-  // only smoothes lips
+  // smoothes keypoints and recalculates box
   smoothBodies(pbodies, bodies, smoothness) {
     // todos:
     // [ ] add multi-body support
     // [ ] pair closest pbody and body
     // for (let i = 0; i < bodies.length; i++) {
+    const matchedIndices = [];
+    for (let i = 0; i < bodies.length; i++) {
+      const body = bodies[i];
+      let closestDistance = Infinity;
+      let closestIndex;
+      for (let j = 0; j < pbodies.length; j++) {
+        const pbody = pbodies[j];
+        const centerDistance = this.bodyCenterDist(pbody, body);
+        if (centerDistance < closestDistance) {
+          closestDistance = centerDistance;
+          closestIndex = j;
+        }
+      }
+      matchedIndices.push([i, closestIndex]);
+    }
     for (let i = 0; i < 1; i++) {
       // console.log(bodies);
       const body = bodies[i];
@@ -215,14 +218,54 @@ class Ml5Manager {
       const pscore = 1;
       const keypoints = body.keypoints;
       const pkeypoints = pbody.keypoints;
+      let xMin = Infinity;
+      let yMin = Infinity;
+      let xMax = -Infinity;
+      let yMax = -Infinity;
+      let width = 0;
+      let height = 0;
       for (let j = 0; j < keypoints.length; j++) {
         const keypoint = keypoints[j];
         const pkeypoint = pkeypoints[j];
-        bodies[i].keypoints[j].x = this.smoothData(pkeypoint.x, keypoint.x, pscore, score, smoothness);
-        bodies[i].keypoints[j].y = this.smoothData(pkeypoint.y, keypoint.y, pscore, score, smoothness);
+        const x = (bodies[i].keypoints[j].x = this.smoothData(pkeypoint.x, keypoint.x, pscore, score, smoothness));
+        const y = (bodies[i].keypoints[j].y = this.smoothData(pkeypoint.y, keypoint.y, pscore, score, smoothness));
+        if (x < xMin) xMin = x;
+        if (y < yMin) yMin = y;
+        if (x > xMax) xMax = x;
+        if (y > yMax) yMax = y;
+        const distance = this.dist(x, y, pkeypoint.x, pkeypoint.y);
+        bodies[i].keypoints[j].intensity = this.distanceToIntensity(distance);
       }
+      width = xMax - xMin;
+      height = yMax - yMin;
+      bodies[i].box = { xMin, yMin, xMax, yMax, width, height };
+      // fixed intensity
+      //bodies[i].intensity = 1.2;
+      //const centerDistance = this.bodyCenterDist(pbody, body);
+      //bodies[i].intensity = this.distanceToIntensity(centerDistance);
     }
     return bodies;
+  }
+
+  distanceToIntensity(distance) {
+    return 1.2 - distance * 8;
+  }
+
+  bodyCenterDist(body1, body2) {
+    const body1Center = {
+      x: body1.box.xMin + body1.box.width / 2,
+      y: body1.box.yMin + body1.box.height / 2,
+    };
+    const body2Center = {
+      x: body2.box.xMin + body2.box.width / 2,
+      y: body2.box.yMin + body2.box.height / 2,
+    };
+    const centerDistance = this.dist(body1Center.x, body1Center.y, body2Center.x, body2Center.y);
+    return centerDistance;
+  }
+
+  dist(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) ** 2, (y2 - y1) ** 2);
   }
 
   getBodyDiffScores(pbodies, bodies) {
@@ -271,5 +314,23 @@ class Ml5Manager {
   updateRefSize(canvasWidth, canvasHeight) {
     const canvasShort = p5sketch.min(canvasWidth, canvasHeight);
     this.refSize = canvasShort;
+  }
+
+  recordBodies(bodies) {
+    // Press key to record
+    if (p5sketch.keyIsPressed) {
+      this.recordedBodies.push(bodies);
+      // console.log('recording');
+    }
+
+    // Press mouse to init and clear recorded bodies
+    if (p5sketch.mouseIsPressed) {
+      if (this.recordedBodies?.length > 0) {
+        console.log("saving recorded bodies");
+        p5sketch.saveJSON(this.recordedBodies, "bodypose.json");
+      }
+      console.log("resetting recorded bodies");
+      this.recordedBodies = [];
+    }
   }
 }

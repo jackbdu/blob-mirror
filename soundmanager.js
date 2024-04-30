@@ -138,6 +138,7 @@ class SoundManager {
         for (const [index, coord] of coords.entries()) {
           coordValueArray.push(coord.x);
           coordValueArray.push(coord.y);
+          coordValueArray.push(coord.intensity);
           if (category === "rhythm") {
             coordValueArray.push(this.rhythmMeter.getValue());
             coordValueArray.push(0);

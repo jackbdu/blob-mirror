@@ -144,10 +144,10 @@ const sketch = (p) => {
           // trackerConfig: {},
           // modelUrl: undefined,
         },
-        smoothness: 0.8,
+        smoothness: 0.9,
         // isDebugging: true,
         categorizedIndices: {
-          rhythm: [1, 2],
+          rhythm: [3, 4],
           melody: [10, 8, 7, 9],
           timbre: [6, 12, 11, 5],
           chord: [16, 14, 13, 15],

@@ -4,7 +4,7 @@ precision mediump float;
 
 #define PI 3.14159265359
 #define BODY_COORDS_NUM 14
-#define BODY_COORD_LENGTH 4
+#define BODY_COORD_LENGTH 5
 
 // Attributes passed from vertex shader.
 varying vec2 vTexCoord;
@@ -36,15 +36,15 @@ vec4 toColorDepth(vec4 inColor, float colorDepth) {
 vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH]) {
   // glowing
   const float overallOffset = -4.0;
-  const float intensity = 1.0;
   float shortSide = min(resolution.x, resolution.y);
   
   vec4 outColor = vec4(0.0);
   for (int i = 0; i < BODY_COORDS_NUM*BODY_COORD_LENGTH; i += BODY_COORD_LENGTH) {
     float x = bodyCoords[i];
     float y = bodyCoords[i+1];
-    float meterValue = bodyCoords[i+2];
-    float category = bodyCoords[i+3];
+    float intensity = 1.0/bodyCoords[i+2];
+    float meterValue = bodyCoords[i+3];
+    float category = bodyCoords[i+4];
     vec2 bodyCoord = vec2(x + 0.5, 0.5 - y);
     vec2 scaledBodyCoord = bodyCoord * resolution;
     float distanceToBodyCoord = distance(scaledBodyCoord, gl_FragCoord.xy)/shortSide;
