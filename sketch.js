@@ -17,7 +17,7 @@ const sketch = (p) => {
     outputHeight: "auto",
     //showStats: true,
     canvas: undefined,
-    seed: 0,
+    seed: 20240430,
   };
 
   p.options = {
@@ -153,7 +153,7 @@ const sketch = (p) => {
           chord: [16, 14, 13, 15],
         },
         strokeWeight: 0.01,
-        strokeColor: "#fff",
+        strokeColor: "#f00",
         size: 0.75,
       },
     },
@@ -247,7 +247,7 @@ const sketch = (p) => {
     p.background(p.options.visuals.backgroundColor);
     p.shaderManager.draw(p);
     p.uiManager.display(p);
-    // p.ml5Manager.display(p);
+    //p.ml5Manager.display(p);
   };
 
   p.mousePressed = (event) => {

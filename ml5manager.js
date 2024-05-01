@@ -134,11 +134,17 @@ class Ml5Manager {
     } else {
       bodies = this.normalizeBodies(bodies);
     }
+    // ensures two bodies
     if (bodies.length > 0 && this.bodies.length > 0) {
       // console.log(bodies);
       this.pbodies = this.bodies;
       this.bodies = this.smoothBodies(this.pbodies, bodies, this.smoothness);
     } else if (bodies.length > 0 && !this.bodies.length > 0) {
+      if (bodies.length < 2) {
+        bodies[1] = JSON.parse(JSON.stringify(bodies[0]));
+      } else if (bodies.length > 2) {
+        bodies.slice(2);
+      }
       this.pbodies = bodies;
       this.bodies = bodies;
     }
@@ -179,7 +185,7 @@ class Ml5Manager {
       p5sketch.scale(scaleX > scaleY ? scaleY : scaleX);
       const x = body.box.xMin + body.box.width / 2;
       const y = body.box.yMin + body.box.height / 2;
-      p5sketch.translate(-p5sketch.width / 2 - x / 2, -p5sketch.height / 2 - y / 2);
+      p5sketch.translate(-x / 2, -y / 2);
       //this.drawKeypoints(p5sketch, body.keypoints, this.visibleIndices);
       this.drawKeypoints(p5sketch, body.keypoints);
       p5sketch.pop();
@@ -196,55 +202,69 @@ class Ml5Manager {
     // [ ] pair closest pbody and body
     // for (let i = 0; i < bodies.length; i++) {
     const matchedIndices = [];
-    for (let i = 0; i < bodies.length; i++) {
-      const body = bodies[i];
-      let closestDistance = Infinity;
-      let closestIndex;
-      for (let j = 0; j < pbodies.length; j++) {
-        const pbody = pbodies[j];
+    const pbodiesIndexDistancePairs = [];
+    for (let i = 0; i < pbodies.length; i++) {
+      const pbody = pbodies[i];
+      const pbodyIndexDistancePairs = [];
+      for (let j = 0; j < bodies.length; j++) {
+        const body = bodies[j];
         const centerDistance = this.bodyCenterDist(pbody, body);
-        if (centerDistance < closestDistance) {
-          closestDistance = centerDistance;
-          closestIndex = j;
-        }
+        pbodyIndexDistancePairs.push({ index: j, distance: centerDistance });
       }
+      // ascending order
+      pbodyIndexDistancePairs.sort((indexDistPair1, indexDistPair2) => indexDistPair1.distance - indexDistPair2.distance);
+      pbodiesIndexDistancePairs.push(pbodyIndexDistancePairs);
+      const closestIndex = pbodyIndexDistancePairs[0].index;
       matchedIndices.push([i, closestIndex]);
     }
-    for (let i = 0; i < 1; i++) {
+    if (bodies.length > 1) {
+      const matchedIndex1 = matchedIndices[0][1];
+      const matchedIndex2 = matchedIndices[1][1];
+      if (matchedIndex1 === matchedIndex2) {
+        const secondClosestIndexDistancePair1 = pbodiesIndexDistancePairs[0][1];
+        const secondClosestIndexDistancePair2 = pbodiesIndexDistancePairs[1][1];
+        if (secondClosestIndexDistancePair1.distance <= secondClosestIndexDistancePair2.distance) {
+          matchedIndices[0][1] = secondClosestIndexDistancePair1.index;
+        } else {
+          matchedIndices[1][1] = secondClosestIndexDistancePair2.index;
+        }
+      }
+    }
+    for (const [i, j] of matchedIndices) {
       // console.log(bodies);
-      const body = bodies[i];
       const pbody = pbodies[i];
+      const body = bodies[j];
       const score = 1;
       const pscore = 1;
-      const keypoints = body.keypoints;
       const pkeypoints = pbody.keypoints;
+      const keypoints = body.keypoints;
       let xMin = Infinity;
       let yMin = Infinity;
       let xMax = -Infinity;
       let yMax = -Infinity;
       let width = 0;
       let height = 0;
-      for (let j = 0; j < keypoints.length; j++) {
-        const keypoint = keypoints[j];
-        const pkeypoint = pkeypoints[j];
-        const x = (bodies[i].keypoints[j].x = this.smoothData(pkeypoint.x, keypoint.x, pscore, score, smoothness));
-        const y = (bodies[i].keypoints[j].y = this.smoothData(pkeypoint.y, keypoint.y, pscore, score, smoothness));
+      for (let k = 0; k < keypoints.length; k++) {
+        const keypoint = keypoints[k];
+        const pkeypoint = pkeypoints[k];
+        const x = (pbodies[i].keypoints[k].x = this.smoothData(pkeypoint.x, keypoint.x, pscore, score, smoothness));
+        const y = (pbodies[i].keypoints[k].y = this.smoothData(pkeypoint.y, keypoint.y, pscore, score, smoothness));
         if (x < xMin) xMin = x;
         if (y < yMin) yMin = y;
         if (x > xMax) xMax = x;
         if (y > yMax) yMax = y;
         const distance = this.dist(x, y, pkeypoint.x, pkeypoint.y);
-        bodies[i].keypoints[j].intensity = this.distanceToIntensity(distance);
+        pbodies[i].keypoints[k].intensity = this.distanceToIntensity(distance);
       }
       width = xMax - xMin;
       height = yMax - yMin;
-      bodies[i].box = { xMin, yMin, xMax, yMax, width, height };
+      pbodies[i].box = { xMin, yMin, xMax, yMax, width, height };
       // fixed intensity
       //bodies[i].intensity = 1.2;
       //const centerDistance = this.bodyCenterDist(pbody, body);
       //bodies[i].intensity = this.distanceToIntensity(centerDistance);
     }
-    return bodies;
+    return pbodies;
   }
 
   distanceToIntensity(distance) {

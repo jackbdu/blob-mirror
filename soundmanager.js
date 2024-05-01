@@ -155,6 +155,7 @@ class SoundManager {
         }
       }
     }
+    //console.log(coordValueArray.length);
     return coordValueArray;
   }
 

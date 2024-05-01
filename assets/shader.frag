@@ -5,6 +5,7 @@ precision mediump float;
 #define PI 3.14159265359
 #define BODY_COORDS_NUM 14
 #define BODY_COORD_LENGTH 5
+#define BODIES_NUM 2
 
 // Attributes passed from vertex shader.
 varying vec2 vTexCoord;
@@ -19,7 +20,7 @@ uniform int uFrameCount; // switch this to time later depending on priority
 uniform int uLoopFramesNum; // minimum loop frames
 uniform int uColorDepth;
 uniform int uPixelationShortNum;
-uniform float uBodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH];
+uniform float uBodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM];
 uniform float uLoopProgress; // progress repeats within normal range 0 to 1
 
 vec4 toLuminance(vec4 inColor) {
@@ -33,13 +34,13 @@ vec4 toColorDepth(vec4 inColor, float colorDepth) {
   return outColor;
 }
 
-vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH]) {
+vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM]) {
   // glowing
   const float overallOffset = -4.0;
   float shortSide = min(resolution.x, resolution.y);
   
   vec4 outColor = vec4(0.0);
-  for (int i = 0; i < BODY_COORDS_NUM*BODY_COORD_LENGTH; i += BODY_COORD_LENGTH) {
+  for (int i = 0; i < BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM; i += BODY_COORD_LENGTH) {
     float x = bodyCoords[i];
     float y = bodyCoords[i+1];
     float intensity = 1.0/bodyCoords[i+2];

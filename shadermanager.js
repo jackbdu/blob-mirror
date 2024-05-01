@@ -45,6 +45,7 @@ class ShaderManager {
     // this.g.rect(-this.g.width/2, -this.g.height/2, this.g.width, this.g.height);
 
     p.clear();
+    p.push();
     p.shader(this.shader);
     p.noStroke();
     p.rect(-p5sketch.width / 2, -p5sketch.height / 2, p5sketch.width, p5sketch.height);
@@ -58,6 +59,7 @@ class ShaderManager {
     // p.vertex(0, 400, 0, 1);
     // p.vertex(400, 200, 1, 1);
     // p.endShape();
+    p.pop();
 
     return p;
   }
