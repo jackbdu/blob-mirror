@@ -153,8 +153,8 @@ class Ml5Manager {
   update(particleCoords) {
     // only updates keypoints, assuming other properties aren't being used
     const placeholderBodies = [];
-    let particleIndex = 0;
     for (const pbody of this.pbodies) {
+      let particleIndex = 0;
       const placeholderBody = JSON.parse(JSON.stringify(pbody));
       for (let i = 0; i < placeholderBody.keypoints.length; i++) {
         placeholderBody.keypoints[i].x = particleCoords[particleIndex].x;
