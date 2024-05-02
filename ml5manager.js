@@ -137,8 +137,8 @@ class Ml5Manager {
     // ensures two bodies
     if (bodiesLength > 0 && this.bodies.length > 0) {
       // console.log(bodies);
-      this.pbodies = this.bodies;
-      this.bodies = this.smoothBodies(this.pbodies, bodies, this.smoothness);
+      this.pbodies = JSON.parse(JSON.stringify(this.bodies));
+      this.bodies = this.smoothBodies(this.bodies, bodies, this.smoothness);
     } else if (bodiesLength > 0 && !this.bodies.length > 0) {
       if (bodiesLength > this.maxBodiesNum) bodies.slice(this.maxBodiesNum);
       for (let i = 1; i < this.maxBodiesNum; i++) {

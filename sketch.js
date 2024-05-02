@@ -15,7 +15,7 @@ const sketch = (p) => {
     loopFramesNum: 240,
     outputWidth: "auto",
     outputHeight: "auto",
-    //showStats: true,
+    showStats: true,
     canvas: undefined,
     seed: 20240430,
   };
@@ -87,7 +87,8 @@ const sketch = (p) => {
           volume: -4,
         },
         bpmDiffAmplitude: 12000,
-        bpm: 160,
+        bpm: 80,
+        maxBpm: 400,
         timeSignature: 4,
         interval: "4n",
         minMidi: 12,
