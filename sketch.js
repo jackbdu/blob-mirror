@@ -260,7 +260,7 @@ const sketch = (p) => {
     p.updateCanvas(p.specs.outputWidth, p.specs.outputHeight);
     p.mediaManager.canvasResized(p.width, p.height);
     p.shaderManager.canvasResized(p.width, p.height);
-    p.ml5Manager.updateRefSize(p.width, p.height);
+    p.ml5Manager.canvasResized(p.width, p.height);
   };
 
   p.updateCanvas = (outputWidth = "auto", outputHeight = "auto") => {

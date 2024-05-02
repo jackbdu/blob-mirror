@@ -26,22 +26,20 @@ class Ml5Manager {
   setup(canvasWidth, canvasHeight, options) {
     this.maxBodiesNum = options?.maxBodiesNum ?? 1;
     this.smoothness = options?.smoothness ?? 0.5;
-    this.isDebugging = options?.isDebugging ?? false;
-    //this.visibleIndices = options?.visibleIndices ?? undefined;
     this.categorizedIndices = options?.categorizedIndices ?? {};
+    this.isDebugging = options?.isDebugging ?? false;
     this.strokeWeight = options?.strokeWeight ?? 0.01;
     this.strokeColor = options?.strokeColor ?? "#fff";
     this.size = options?.size ?? 1;
     const bodyPoseOptions = options?.bodyPose ?? {};
     const modelName = options?.modelName ?? "MoveNet";
-    // console.log(this.placeholderBodies.sequence);
-    this.updateRefSize(canvasWidth, canvasHeight);
+    this.canvasResized(canvasWidth, canvasHeight);
     this.bodies = [];
     this.pbodies = [];
     this.movementScores = [0];
     try {
       this.graphics = options?.graphics;
-      // use less pixel to increase performance
+      // use less pixel to better performance
       this.graphics.pixelDensity(1);
     } catch (e) {
       console.error(e);
@@ -58,6 +56,7 @@ class Ml5Manager {
     });
   }
 
+  // returns an array of objects containing categorized coordinates for all bodies
   getCategorizedCoords() {
     const categorizedCoords = [];
     for (const body of this.bodies) {
@@ -188,7 +187,6 @@ class Ml5Manager {
         const x = body.box.xMin + body.box.width / 2;
         const y = body.box.yMin + body.box.height / 2;
         p5sketch.translate(-x / 2, -y / 2);
-        //this.drawKeypoints(p5sketch, body.keypoints, this.visibleIndices);
         this.drawKeypoints(p5sketch, body.keypoints);
         p5sketch.pop();
       }
@@ -291,6 +289,7 @@ class Ml5Manager {
     return Math.sqrt((x2 - x1) ** 2, (y2 - y1) ** 2);
   }
 
+  // [ ] use center coordinates to get differences, current method of calculating all differences is essentially the same
   getBodyDiffScores(pbodies, bodies) {
     const diffScores = [];
     for (let i = 0; i < pbodies.length && i < bodies.length; i++) {
@@ -310,35 +309,26 @@ class Ml5Manager {
     return diffScores;
   }
 
-  //drawKeypoints(p5sketch, keypoints, visibleIndices) {
   drawKeypoints(p5sketch, keypoints) {
-    // console.log('hello');
     p5sketch.push();
-    // p5sketch.circle(0,0,100);
-    // p5sketch.translate(-p5sketch.width/2, -p5sketch.height/2);
-    // p5sketch.beginShape(p5sketch.TRIANGLE_STRIP);
     p5sketch.stroke(this.strokeColor);
     p5sketch.strokeWeight(this.strokeWeight * this.refSize);
     p5sketch.beginShape(p5sketch.POINTS);
-    // for (let keypoint of keypoints) {
     for (let i = 0; i < keypoints.length; i++) {
-      //for (let i of visibleIndices) {
       const keypoint = keypoints[i];
       p5sketch.vertex(keypoint.x, keypoint.y);
-      // p5sketch.textSize(10);
-      // p5sketch.textAlign(p5sketch.CENTER, p5sketch.CENTER);
-      // p5sketch.fill(this.strokeColor);
-      // p5sketch.text(i, keypoint.x, keypoint.y);
     }
     p5sketch.endShape();
     p5sketch.pop();
   }
 
-  updateRefSize(canvasWidth, canvasHeight) {
+  // canvasShort is useful only normalizing coordinates, which is not used for current implementation
+  canvasResized(canvasWidth, canvasHeight) {
     const canvasShort = p5sketch.min(canvasWidth, canvasHeight);
     this.refSize = canvasShort;
   }
 
+  // recording bodies for loading as placeholder later
   recordBodies(bodies) {
     // Press key to record
     if (p5sketch.keyIsPressed) {
