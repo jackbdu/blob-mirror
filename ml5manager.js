@@ -204,7 +204,6 @@ class Ml5Manager {
     }
     // below code only works for maxBodiesNum = 2 or lower
     if (bodies.length > 1) {
-      console.log("okay");
       for (let i = 1; i < pbodies.length; i++) {
         const closestBodyIndexPrevious = pbodies[i - 1].matchedBodies[0].index;
         const closestBodyIndex = pbodies[i].matchedBodies[0].index;
