@@ -69,7 +69,7 @@ class SoundManager {
       if (this.destBpm !== this.Tone.Transport.bpm.value) {
         const rampTime = this.smoothness;
         this.Tone.Transport.bpm.rampTo(this.destBpm, rampTime, time);
-        console.log(this.Tone.Transport.bpm.value);
+        //console.log(this.Tone.Transport.bpm.value);
       }
 
       const barsBeatsSixteens = this.Tone.Transport.position.split(":");
