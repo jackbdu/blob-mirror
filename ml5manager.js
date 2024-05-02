@@ -24,6 +24,7 @@ class Ml5Manager {
     this.placeholderBodies = [p5sketch.loadJSON(options.placeholderBodyPath)];
   }
   setup(canvasWidth, canvasHeight, options) {
+    this.maxBodiesNum = options?.maxBodiesNum ?? 1;
     this.smoothness = options?.smoothness ?? 0.5;
     this.isDebugging = options?.isDebugging ?? false;
     //this.visibleIndices = options?.visibleIndices ?? undefined;
@@ -176,19 +177,21 @@ class Ml5Manager {
   }
 
   display(p5sketch) {
-    // console.log(JSON.stringify(this.bodies))
-    for (let body of this.bodies) {
-      // console.log(body);
-      p5sketch.push();
-      const scaleX = (this.refSize / body.box.width) * this.size;
-      const scaleY = (this.refSize / body.box.height) * this.size;
-      p5sketch.scale(scaleX > scaleY ? scaleY : scaleX);
-      const x = body.box.xMin + body.box.width / 2;
-      const y = body.box.yMin + body.box.height / 2;
-      p5sketch.translate(-x / 2, -y / 2);
-      //this.drawKeypoints(p5sketch, body.keypoints, this.visibleIndices);
-      this.drawKeypoints(p5sketch, body.keypoints);
-      p5sketch.pop();
+    if (this.isDebugging) {
+      // console.log(JSON.stringify(this.bodies))
+      for (let body of this.bodies) {
+        // console.log(body);
+        p5sketch.push();
+        const scaleX = (this.refSize / body.box.width) * this.size;
+        const scaleY = (this.refSize / body.box.height) * this.size;
+        p5sketch.scale(scaleX > scaleY ? scaleY : scaleX);
+        const x = body.box.xMin + body.box.width / 2;
+        const y = body.box.yMin + body.box.height / 2;
+        p5sketch.translate(-x / 2, -y / 2);
+        //this.drawKeypoints(p5sketch, body.keypoints, this.visibleIndices);
+        this.drawKeypoints(p5sketch, body.keypoints);
+        p5sketch.pop();
+      }
     }
   }
 
@@ -198,8 +201,8 @@ class Ml5Manager {
   // smoothes keypoints and recalculates box
   smoothBodies(pbodies, bodies, smoothness) {
     // todos:
-    // [ ] add multi-body support
-    // [ ] pair closest pbody and body
+    // [x] add multi-body support
+    // [x] pair closest pbody and body
     // for (let i = 0; i < bodies.length; i++) {
     const matchedIndices = [];
     const pbodiesIndexDistancePairs = [];

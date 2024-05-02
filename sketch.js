@@ -133,6 +133,8 @@ const sketch = (p) => {
         placeholderBodyPath: "assets/bodypose.json",
       },
       setup: {
+        maxBodiesNum: 2,
+        smoothness: 0.9,
         modelName: "MoveNet",
         bodyPose: {
           modelType: "MULTIPOSE_LIGHTNING", // "MULTIPOSE_LIGHTNING", "SINGLEPOSE_LIGHTNING", or "SINGLEPOSE_THUNDE"
@@ -144,17 +146,16 @@ const sketch = (p) => {
           // trackerConfig: {},
           // modelUrl: undefined,
         },
-        smoothness: 0.9,
-        // isDebugging: true,
         categorizedIndices: {
           rhythm: [3, 4],
           melody: [10, 8, 7, 9],
           timbre: [6, 12, 11, 5],
           chord: [16, 14, 13, 15],
         },
-        strokeWeight: 0.01,
-        strokeColor: "#f00",
-        size: 0.75,
+        //isDebugging: true,
+        //strokeWeight: 0.01,
+        //strokeColor: "#f00",
+        //size: 0.75,
       },
     },
     ui: {
@@ -247,7 +248,7 @@ const sketch = (p) => {
     p.background(p.options.visuals.backgroundColor);
     p.shaderManager.draw(p);
     p.uiManager.display(p);
-    //p.ml5Manager.display(p);
+    p.ml5Manager.display(p);
   };
 
   p.mousePressed = (event) => {
