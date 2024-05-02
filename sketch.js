@@ -15,7 +15,7 @@ const sketch = (p) => {
     loopFramesNum: 240,
     outputWidth: "auto",
     outputHeight: "auto",
-    showStats: true,
+    //showStats: true,
     canvas: undefined,
     seed: 20240430,
   };

@@ -28,6 +28,7 @@ class SoundManager {
     const timeSignature = options?.timeSignature ?? 4;
 
     this.bpm = options?.bpm ?? 120;
+    this.maxBpm = options?.maxBpm ?? 300;
     this.destBpm = this.bpm;
     this.bpmDiffAmplitude = options?.bpmDiffAmplitude ?? 20;
     this.melodyCenterMidi = options?.melodyCenterMidi ?? 60;
@@ -108,6 +109,7 @@ class SoundManager {
 
   update(categorizedCoords, bpmDiffFactor) {
     this.destBpm = Math.floor(this.bpm + this.bpmDiffAmplitude * bpmDiffFactor);
+    this.destBpm = Math.min(this.maxBpm, this.destBpm);
     this.categorizedCoords = categorizedCoords;
     for (const [bodyIndex, bodyCoords] of this.categorizedCoords.entries()) {
       for (const [category, coords] of Object.entries(bodyCoords)) {

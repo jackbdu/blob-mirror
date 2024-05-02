@@ -293,7 +293,6 @@ class Ml5Manager {
     return Math.sqrt((x2 - x1) ** 2, (y2 - y1) ** 2);
   }
 
-  // [ ] use center coordinates to get differences, current method of calculating all differences is essentially the same
   getBodyDiffScores(pbodies, bodies) {
     const diffScores = [];
     for (let i = 0; i < pbodies.length && i < bodies.length; i++) {
