@@ -215,7 +215,6 @@ class Ml5Manager {
         const closestBodyIndexPrevious = pbodies[i - 1].matchedBodies[0].index;
         const closestBodyIndex = pbodies[i].matchedBodies[0].index;
         if (closestBodyIndex === closestBodyIndexPrevious) {
-          console.log(bodies[i - 1].matchedBodies, bodies);
           const secondClosestBodyIndexPrevious = pbodies[i - 1].matchedBodies[1].index;
           const secondClosestBodyIndex = pbodies[i].matchedBodies[1].index;
           if (secondClosestBodyIndex < secondClosestBodyIndexPrevious) {
