@@ -187,6 +187,22 @@ class Ml5Manager {
   smoothData(prevData, newData, prevScore, newScore, smoothness) {
     return (prevData * smoothness * prevScore + newData * (1 - smoothness) * newScore) / ((prevScore + newScore) / 2);
   }
+
+  // todo: [] recurisvely clean up matches so that as many pbodies can have unique matches
+  cleanupMatches(pbodies, bodies) {
+    for (const body of bodies) {
+      body.matchedPbodies = [];
+      for (const pbody of pbodies) {
+        if (body.index === pbody.matchedBodies[0].index) {
+          body.matchedPbodies.push(pbody);
+        }
+      }
+      for (const body of bodies) {
+        if (body.matchedPbodies.length > 1) {
+        }
+      }
+    }
+  }
   // smoothes keypoints and recalculates box
   // ensures output bodies num matches pbodies num
   smoothBodies(pbodies, bodies, smoothness) {
@@ -202,6 +218,8 @@ class Ml5Manager {
       // ascending order
       pbody.matchedBodies.sort((body1, body2) => body1.distance - body2.distance);
     }
+
+    //this.cleanupMatches(pbodies, bodies);
     // below code only works for maxBodiesNum = 2 or lower
     if (bodies.length > 1) {
       for (let i = 1; i < pbodies.length; i++) {
