@@ -83,8 +83,9 @@ class SoundManager {
       }
       const intervalDuration = this.Tone.Time(interval);
       // play melody
-      if (this.melodyMidis.length > 0 && beat % 2 == 0) {
-        this.melodyMidiIndex = ((bar % 2) * 2 + Math.floor(beat / 2)) % this.melodyMidis.length;
+      if (this.melodyMidis.length) {
+        //this.melodyMidiIndex = ((bar % 2) * 2 + Math.floor(beat / 2)) % this.melodyMidis.length;
+        this.melodyMidiIndex = (this.melodyMidiIndex + 1) % this.melodyMidis.length;
         const melodyMidi = this.melodyMidis[this.melodyMidiIndex];
         const melodyNote = this.Tone.Frequency(melodyMidi, "midi");
         const melodyNoteDuration = intervalDuration;
@@ -108,22 +109,24 @@ class SoundManager {
   update(categorizedCoords, bpmDiffFactor) {
     this.destBpm = Math.floor(this.bpm + this.bpmDiffAmplitude * bpmDiffFactor);
     this.categorizedCoords = categorizedCoords;
-    for (const bodyCoords of this.categorizedCoords) {
+    for (const [bodyIndex, bodyCoords] of this.categorizedCoords.entries()) {
       for (const [category, coords] of Object.entries(bodyCoords)) {
         if (category === "melody") {
-          for (const [index, coord] of coords.entries()) {
+          for (const [coordIndex, coord] of coords.entries()) {
             const horizontalOffset = Math.round(this.horizontalSemitonesNum * coord.x);
             const verticalOffset = Math.round(this.verticalSemitonesNum * (1 - coord.y));
             const midiValue = this.melodyCenterMidi + horizontalOffset + verticalOffset;
             const constrainedMidiValue = Math.min(Math.max(this.minMidi, midiValue), this.maxMidi);
+            const index = bodyIndex * coords.length + coordIndex;
             this.melodyMidis[index] = constrainedMidiValue;
           }
         } else if (category === "chord") {
-          for (const [index, coord] of coords.entries()) {
+          for (const [coordIndex, coord] of coords.entries()) {
             const horizontalOffset = Math.round(this.horizontalSemitonesNum * coord.x);
             const verticalOffset = Math.round(this.verticalSemitonesNum * (1 - coord.y));
             const midiValue = this.chordCenterMidi + horizontalOffset + verticalOffset;
             const constrainedMidiValue = Math.min(Math.max(this.minMidi, midiValue), this.maxMidi);
+            const index = bodyIndex * coords.length + coordIndex;
             this.chordMidis[index] = constrainedMidiValue;
           }
         }
@@ -133,9 +136,10 @@ class SoundManager {
 
   getCoordValueArray() {
     const coordValueArray = [];
-    for (const bodyCoords of this.categorizedCoords) {
+    for (const [bodyIndex, bodyCoords] of this.categorizedCoords.entries()) {
       for (const [category, coords] of Object.entries(bodyCoords)) {
-        for (const [index, coord] of coords.entries()) {
+        for (const [coordIndex, coord] of coords.entries()) {
+          const index = bodyIndex * coords.length + coordIndex;
           coordValueArray.push(coord.x);
           coordValueArray.push(coord.y);
           coordValueArray.push(coord.intensity);
