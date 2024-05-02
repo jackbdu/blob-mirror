@@ -129,22 +129,22 @@ class Ml5Manager {
   updateBodies(bodies) {
     if (bodies.length < 1) {
       // const placeholderBodies = this.placeholderBodies.getNextFrame();
-      // bodies = JSON.parse(JSON.stringify(placeholderBodies));
       bodies = JSON.parse(JSON.stringify(this.placeholderBodies));
     } else {
       bodies = this.normalizeBodies(bodies);
     }
+    const bodiesLength = bodies.length;
     // ensures two bodies
-    if (bodies.length > 0 && this.bodies.length > 0) {
+    if (bodiesLength > 0 && this.bodies.length > 0) {
       // console.log(bodies);
       this.pbodies = this.bodies;
       this.bodies = this.smoothBodies(this.pbodies, bodies, this.smoothness);
-    } else if (bodies.length > 0 && !this.bodies.length > 0) {
-      if (bodies.length > this.maxBodiesNum) bodies.slice(this.maxBodiesNum);
+    } else if (bodiesLength > 0 && !this.bodies.length > 0) {
+      if (bodiesLength > this.maxBodiesNum) bodies.slice(this.maxBodiesNum);
       for (let i = 1; i < this.maxBodiesNum; i++) {
-        if (i >= bodies.length) {
+        if (i >= bodiesLength) {
           // make a copy of detected body in an alternating order
-          bodies[i] = JSON.parse(JSON.stringify(bodies[i % bodies.length]));
+          bodies[i] = JSON.parse(JSON.stringify(bodies[i % bodiesLength]));
         }
       }
       this.pbodies = bodies;
@@ -156,20 +156,13 @@ class Ml5Manager {
 
   update(particleCoords) {
     // only updates keypoints, assuming other properties aren't being used
-    const placeholderBodies = [];
-    for (const pbody of this.pbodies) {
+    for (const placeholderBody of this.placeholderBodies) {
       let particleIndex = 0;
-      const placeholderBody = JSON.parse(JSON.stringify(pbody));
       for (let i = 0; i < placeholderBody.keypoints.length; i++) {
         placeholderBody.keypoints[i].x = particleCoords[particleIndex].x;
         placeholderBody.keypoints[i].y = particleCoords[particleIndex].y;
         particleIndex++;
       }
-      //console.log(placeholderBody.keypoints);
-      placeholderBodies.push(placeholderBody);
-    }
-    if (placeholderBodies.length > 0) {
-      this.placeholderBodies = placeholderBodies;
     }
   }
 
@@ -211,6 +204,7 @@ class Ml5Manager {
     }
     // below code only works for maxBodiesNum = 2 or lower
     if (bodies.length > 1) {
+      console.log("okay");
       for (let i = 1; i < pbodies.length; i++) {
         const closestBodyIndexPrevious = pbodies[i - 1].matchedBodies[0].index;
         const closestBodyIndex = pbodies[i].matchedBodies[0].index;

@@ -26,7 +26,7 @@ const sketch = (p) => {
       backgroundColor: "#000",
     },
     particle: {
-      maxNum: 34,
+      maxNum: 17, // one set of bodypose keypoints
       xFactor: 0.003,
       yFactor: 0.002,
     },
