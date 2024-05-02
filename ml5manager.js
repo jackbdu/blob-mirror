@@ -140,20 +140,18 @@ class Ml5Manager {
       this.pbodies = this.bodies;
       this.bodies = this.smoothBodies(this.pbodies, bodies, this.smoothness);
     } else if (bodies.length > 0 && !this.bodies.length > 0) {
-      if (bodies.length < 2) {
-        bodies[1] = JSON.parse(JSON.stringify(bodies[0]));
-      } else if (bodies.length > 2) {
-        bodies.slice(2);
+      if (bodies.length > this.maxBodiesNum) bodies.slice(this.maxBodiesNum);
+      for (let i = 1; i < this.maxBodiesNum; i++) {
+        if (i >= bodies.length) {
+          // make a copy of detected body in an alternating order
+          bodies[i] = JSON.parse(JSON.stringify(bodies[i % bodies.length]));
+        }
       }
       this.pbodies = bodies;
       this.bodies = bodies;
     }
 
     //this.recordBodies(this.bodies);
-
-    // console.log(bodies);
-    for (let body of this.bodies) {
-    }
   }
 
   update(particleCoords) {
@@ -197,44 +195,40 @@ class Ml5Manager {
     return (prevData * smoothness * prevScore + newData * (1 - smoothness) * newScore) / ((prevScore + newScore) / 2);
   }
   // smoothes keypoints and recalculates box
+  // ensures output bodies num matches pbodies num
   smoothBodies(pbodies, bodies, smoothness) {
-    // todos:
-    // [x] add multi-body support
-    // [x] pair closest pbody and body
-    // for (let i = 0; i < bodies.length; i++) {
-    const matchedIndices = [];
-    const pbodiesIndexDistancePairs = [];
     for (let i = 0; i < pbodies.length; i++) {
       const pbody = pbodies[i];
-      const pbodyIndexDistancePairs = [];
+      pbody.matchedBodies = [];
       for (let j = 0; j < bodies.length; j++) {
         const body = bodies[j];
-        const centerDistance = this.bodyCenterDist(pbody, body);
-        pbodyIndexDistancePairs.push({ index: j, distance: centerDistance });
+        body.index = j;
+        body.distance = this.bodyCenterDist(pbody, body);
+        pbody.matchedBodies.push(body);
       }
       // ascending order
-      pbodyIndexDistancePairs.sort((indexDistPair1, indexDistPair2) => indexDistPair1.distance - indexDistPair2.distance);
-      pbodiesIndexDistancePairs.push(pbodyIndexDistancePairs);
-      const closestIndex = pbodyIndexDistancePairs[0].index;
-      matchedIndices.push([i, closestIndex]);
+      pbody.matchedBodies.sort((body1, body2) => body1.distance - body2.distance);
     }
+    // below code only works for maxBodiesNum = 2 or lower
     if (bodies.length > 1) {
-      const matchedIndex1 = matchedIndices[0][1];
-      const matchedIndex2 = matchedIndices[1][1];
-      if (matchedIndex1 === matchedIndex2) {
-        const secondClosestIndexDistancePair1 = pbodiesIndexDistancePairs[0][1];
-        const secondClosestIndexDistancePair2 = pbodiesIndexDistancePairs[1][1];
-        if (secondClosestIndexDistancePair1.distance <= secondClosestIndexDistancePair2.distance) {
-          matchedIndices[0][1] = secondClosestIndexDistancePair1.index;
-        } else {
-          matchedIndices[1][1] = secondClosestIndexDistancePair2.index;
+      for (let i = 1; i < pbodies.length; i++) {
+        const closestBodyIndexPrevious = pbodies[i - 1].matchedBodies[0].index;
+        const closestBodyIndex = pbodies[i].matchedBodies[0].index;
+        if (closestBodyIndex === closestBodyIndexPrevious) {
+          console.log(bodies[i - 1].matchedBodies, bodies);
+          const secondClosestBodyIndexPrevious = pbodies[i - 1].matchedBodies[1].index;
+          const secondClosestBodyIndex = pbodies[i].matchedBodies[1].index;
+          if (secondClosestBodyIndex < secondClosestBodyIndexPrevious) {
+            pbodies[i].matchedBodies.shift();
+          } else {
+            pbodies[i - 1].matchedBodies.shift();
+          }
         }
       }
     }
-    for (const [i, j] of matchedIndices) {
+    for (const pbody of pbodies) {
       // console.log(bodies);
-      const pbody = pbodies[i];
-      const body = bodies[j];
+      const body = pbody.matchedBodies[0];
       const score = 1;
       const pscore = 1;
       const pkeypoints = pbody.keypoints;
@@ -248,18 +242,18 @@ class Ml5Manager {
       for (let k = 0; k < keypoints.length; k++) {
         const keypoint = keypoints[k];
         const pkeypoint = pkeypoints[k];
-        const x = (pbodies[i].keypoints[k].x = this.smoothData(pkeypoint.x, keypoint.x, pscore, score, smoothness));
-        const y = (pbodies[i].keypoints[k].y = this.smoothData(pkeypoint.y, keypoint.y, pscore, score, smoothness));
+        const x = (pbody.keypoints[k].x = this.smoothData(pkeypoint.x, keypoint.x, pscore, score, smoothness));
+        const y = (pbody.keypoints[k].y = this.smoothData(pkeypoint.y, keypoint.y, pscore, score, smoothness));
         if (x < xMin) xMin = x;
         if (y < yMin) yMin = y;
         if (x > xMax) xMax = x;
         if (y > yMax) yMax = y;
         const distance = this.dist(x, y, pkeypoint.x, pkeypoint.y);
-        pbodies[i].keypoints[k].intensity = this.distanceToIntensity(distance);
+        pbody.keypoints[k].intensity = this.distanceToIntensity(distance);
       }
       width = xMax - xMin;
       height = yMax - yMin;
-      pbodies[i].box = { xMin, yMin, xMax, yMax, width, height };
+      pbody.box = { xMin, yMin, xMax, yMax, width, height };
       // fixed intensity
       //bodies[i].intensity = 1.2;
       //const centerDistance = this.bodyCenterDist(pbody, body);
