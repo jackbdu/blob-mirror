@@ -312,6 +312,18 @@ class Ml5Manager {
     return diffScores;
   }
 
+  getRelativeAverageCoord() {
+    const averageCoord = { x: 0, y: 0 };
+    for (const body of this.bodies) {
+      const x = body.box.xMin + body.box.width / 2;
+      const y = body.box.yMin + body.box.height / 2;
+      averageCoord.x = averageCoord.x / 2 + x / 2;
+      averageCoord.y = averageCoord.y / 2 + y / 2;
+    }
+    //console.log(averageCoord);
+    return averageCoord;
+  }
+
   drawKeypoints(p5sketch, keypoints) {
     p5sketch.push();
     p5sketch.stroke(this.strokeColor);

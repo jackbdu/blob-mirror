@@ -20,6 +20,7 @@ uniform int uFrameCount; // switch this to time later depending on priority
 uniform int uLoopFramesNum; // minimum loop frames
 uniform int uColorDepth;
 uniform int uPixelationShortNum;
+uniform int uMode;
 uniform float uBodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM];
 uniform float uLoopProgress; // progress repeats within normal range 0 to 1
 
@@ -78,6 +79,11 @@ vec4 colorFilter(vec4 inColor) {
   return outColor;
 }
 
+vec4 invertColor(vec4 inColor) {
+  vec4 outColor = vec4(1.0 - inColor.rgb, inColor.a);
+  return outColor;
+}
+
 void main() 
 {
   
@@ -90,6 +96,9 @@ void main()
 
   outColor = colorFilter(outColor);
   
+  if (uMode != 0) {
+    outColor = invertColor(outColor);
+  }
   // outColor = toLuminance(outColor);
   //outColor = toColorDepth(outColor, float(uColorDepth));
 

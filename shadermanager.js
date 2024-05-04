@@ -22,7 +22,10 @@ class ShaderManager {
     const colorDepth = options?.colorDepth ?? 8;
     const bodyCoords = options?.bodyCoords ?? [];
     const drumMeterValue = options?.drumMeterValue ?? 0;
+    const relativeAverageCoord = options?.relativeAverageCoord ?? { x: 0, y: 0 };
     const texture = options?.texture;
+
+    const mode = relativeAverageCoord.x > 0 ? 1 : 0;
 
     this.loopProgress += bpm / 100000;
     this.loopProgress = this.loopProgress - Math.floor(this.loopProgress);
@@ -36,6 +39,7 @@ class ShaderManager {
     this.shader.setUniform("uColorDepth", colorDepth);
     this.shader.setUniform("uPixelationShortNum", pixelationShortNum);
     this.shader.setUniform("uBodyCoords", bodyCoords);
+    this.shader.setUniform("uMode", mode);
   }
 
   draw(p = this.g) {

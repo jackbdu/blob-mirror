@@ -237,6 +237,7 @@ const sketch = (p) => {
       mouseY: p.mouseY,
       texture: p.mediaManager.graphics,
       bodyCoords: bodyCoords,
+      relativeAverageCoord: p.ml5Manager.getRelativeAverageCoord(),
     };
     p.shaderManager.update(shaderUpdateOptions);
     const allLoaded = p.mediaManager.loaded && p.ml5Manager.loaded && p.soundManager.loaded;
