@@ -146,13 +146,13 @@ class SoundManager {
           coordValueArray.push(coord.y);
           coordValueArray.push(coord.intensity);
           if (category === "rhythm") {
-            coordValueArray.push(this.rhythmMeter.getValue());
+            coordValueArray.push(this.getRhythmMeterValue());
             coordValueArray.push(0);
           } else if (category === "melody" && index === this.melodyMidiIndex) {
-            coordValueArray.push(this.melodyMeter.getValue());
+            coordValueArray.push(this.getMelodyMeterValue());
             coordValueArray.push(1);
           } else if (category === "chord" && index === this.chordMidiIndex) {
-            coordValueArray.push(this.chordMeter.getValue());
+            coordValueArray.push(this.getChordMeterValue());
             coordValueArray.push(2);
           } else {
             coordValueArray.push(0);
@@ -171,6 +171,10 @@ class SoundManager {
 
   getMelodyMeterValue() {
     return this.melodyMeter.getValue();
+  }
+
+  getChordMeterValue() {
+    return this.chordMeter.getValue();
   }
 
   getBpmValue() {

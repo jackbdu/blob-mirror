@@ -227,7 +227,6 @@ const sketch = (p) => {
     p.ml5Manager.update(particleCoords);
     p.soundManager.update(p.ml5Manager.getCategorizedCoords(), Math.max(...p.ml5Manager.getMovementScores()));
     //console.log(p.ml5Manager.getMovementScores());
-    const rhythmMeterValue = p.soundManager.getRhythmMeterValue();
     const bodyCoords = p.soundManager.getCoordValueArray();
     const shaderUpdateOptions = {
       ...p.options.shader.update,
