@@ -71,10 +71,10 @@ const sketch = (p) => {
             sustain: 0.01,
             release: 0.2,
           },
-          harmonicity: 2,
+          harmonicity: 0.5,
           modulation: {
-            type: "sine",
-            partialCount: 2,
+            type: "fmsine",
+            partialCount: 1,
           },
           modulationEnvelope: {
             attack: 0.05,
@@ -95,9 +95,9 @@ const sketch = (p) => {
         maxMidi: 96,
         melodyCenterMidi: 65,
         chordCenterMidi: 50,
-        chordMidiArrayOffsets: [0, 2, 4],
+        chordMidiArrayOffsets: [0, 2, 5],
         horizontalSemitonesNum: 36,
-        verticalSemitonesNum: 4,
+        verticalSemitonesNum: 24,
       },
     },
     shader: {
@@ -167,7 +167,7 @@ const sketch = (p) => {
       textStyle: p.BOLD,
       messages: {
         loading: "Loading...".toUpperCase(),
-        loaded: "Click to Activate Audio".toUpperCase(),
+        loaded: "Click to Activate Audio and Step Back to Interact".toUpperCase(),
         started: "",
       },
       textFill: 255,
