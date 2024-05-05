@@ -84,6 +84,11 @@ vec4 invertColor(vec4 inColor) {
   return outColor;
 }
 
+vec4 offsetColor(vec4 inColor, float offset) {
+  vec4 outColor = vec4(inColor.rgb+offset, inColor.a);
+  return outColor;
+}
+
 void main() 
 {
   
@@ -99,6 +104,9 @@ void main()
   if (uMode != 0) {
     outColor = invertColor(outColor);
   }
+
+  //outColor = offsetColor(outColor, uMode*1.0);
+
   // outColor = toLuminance(outColor);
   //outColor = toColorDepth(outColor, float(uColorDepth));
 
