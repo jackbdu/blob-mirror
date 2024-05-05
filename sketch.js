@@ -49,43 +49,84 @@ const sketch = (p) => {
           channels: 1,
         },
         // https://tonejs.github.io/docs/14.7.77/interface/FMSynthOptions
-        chordSynth: {
-          maxPolyphony: 6, // double chord notes num in case second chords start before first chords end?
-          harmonicity: 0.5,
-          modulation: {
-            type: "fmsine",
+        chordSynths: [
+          {
+            maxPolyphony: 6, // double chord notes num in case second chords start before first chords end?
+            harmonicity: 0.5,
+            modulation: {
+              type: "fmsine",
+            },
+            volume: -8,
+            envelope: {
+              attack: 0.015,
+              decay: 3.0,
+              sustain: 0.0,
+              release: 0.005,
+            },
           },
-          volume: -8,
-          envelope: {
-            attack: 0.015,
-            decay: 3.0,
-            sustain: 0.0,
-            release: 0.005,
+          {
+            maxPolyphony: 6, // double chord notes num in case second chords start before first chords end?
+            harmonicity: 2,
+            modulation: {
+              type: "sine",
+            },
+            volume: -8,
+            envelope: {
+              attack: 0.015,
+              decay: 3.0,
+              sustain: 0.0,
+              release: 0.005,
+            },
           },
-        },
-        melodySynth: {
-          detune: 0,
-          envelope: {
-            attack: 0.05,
-            decay: 3.0,
-            sustain: 0.01,
-            release: 0.2,
+        ],
+        melodySynths: [
+          {
+            detune: 0,
+            envelope: {
+              attack: 0.05,
+              decay: 3.0,
+              sustain: 0.01,
+              release: 0.2,
+            },
+            harmonicity: 0.5,
+            modulation: {
+              type: "fmsine",
+              partialCount: 1,
+            },
+            modulationEnvelope: {
+              attack: 0.05,
+              decay: 3.0,
+              sustain: 0.01,
+              release: 0.2,
+            },
+            modulationIndex: 2,
+            oscillator: {},
+            volume: -4,
           },
-          harmonicity: 0.5,
-          modulation: {
-            type: "fmsine",
-            partialCount: 1,
+          {
+            detune: 0,
+            envelope: {
+              attack: 0.05,
+              decay: 3.0,
+              sustain: 0.01,
+              release: 0.2,
+            },
+            harmonicity: 2,
+            modulation: {
+              type: "sine",
+              partialCount: 3,
+            },
+            modulationEnvelope: {
+              attack: 0.05,
+              decay: 3.0,
+              sustain: 0.01,
+              release: 0.2,
+            },
+            modulationIndex: 2,
+            oscillator: {},
+            volume: -4,
           },
-          modulationEnvelope: {
-            attack: 0.05,
-            decay: 3.0,
-            sustain: 0.01,
-            release: 0.2,
-          },
-          modulationIndex: 2,
-          oscillator: {},
-          volume: -4,
-        },
+        ],
         bpmDiffAmplitude: 12000,
         bpm: 80,
         maxBpm: 400,
@@ -225,7 +266,7 @@ const sketch = (p) => {
       };
     }
     p.ml5Manager.update(particleCoords);
-    p.soundManager.update(p.ml5Manager.getCategorizedCoords(), Math.max(...p.ml5Manager.getMovementScores()));
+    p.soundManager.update(p.ml5Manager.getCategorizedCoords(), p.ml5Manager.getRelativeAverageCoord(), Math.max(...p.ml5Manager.getMovementScores()));
     //console.log(p.ml5Manager.getMovementScores());
     const bodyCoords = p.soundManager.getCoordValueArray();
     const shaderUpdateOptions = {
@@ -237,7 +278,7 @@ const sketch = (p) => {
       mouseY: p.mouseY,
       texture: p.mediaManager.graphics,
       bodyCoords: bodyCoords,
-      relativeAverageCoord: p.ml5Manager.getRelativeAverageCoord(),
+      mode: p.soundManager.getMode(),
     };
     p.shaderManager.update(shaderUpdateOptions);
     const allLoaded = p.mediaManager.loaded && p.ml5Manager.loaded && p.soundManager.loaded;

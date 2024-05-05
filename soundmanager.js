@@ -5,6 +5,10 @@ class SoundManager {
     this.started = false;
     this.maxVolume = 0;
     this.melodyMidiIndex = 0;
+
+    this.mode = 0;
+    this.modeThreshold = 0;
+    this.modeThresholdHysteresis = 0.02;
   }
 
   preload(options) {
@@ -22,8 +26,8 @@ class SoundManager {
 
   setup(options) {
     const meterOptions = options?.meter ?? {};
-    const melodySynthOptions = options?.melodySynth ?? {};
-    const chordSynthOptions = options?.chordSynth ?? {};
+    const melodySynthsOptions = options?.melodySynths ?? {};
+    const chordSynthsOptions = options?.chordSynths ?? {};
     const interval = options?.interval ?? "8n";
     const timeSignature = options?.timeSignature ?? 4;
 
@@ -45,22 +49,29 @@ class SoundManager {
     this.rhythmPlayers.connect(this.rhythmMeter);
 
     // melody
-    if (melodySynthOptions.volume && melodySynthOptions.volume > this.maxVolume) {
-      melodySynthOptions.volume = this.maxVolume;
-    }
+    this.melodySynths = [];
     this.melodyMeter = new this.Tone.Meter(meterOptions);
-    this.melodySynth = new this.Tone.FMSynth(melodySynthOptions).toDestination();
-    this.melodySynth.connect(this.melodyMeter);
+    for (let i = 0; i < melodySynthsOptions.length; i++) {
+      const melodySynthOptions = melodySynthsOptions[i];
+      if (melodySynthOptions.volume && melodySynthOptions.volume > this.maxVolume) {
+        melodySynthOptions.volume = this.maxVolume;
+      }
+      this.melodySynths[i] = new this.Tone.FMSynth(melodySynthOptions).toDestination();
+      this.melodySynths[i].connect(this.melodyMeter);
+    }
     this.melodyMidis = [];
 
     // chord
-    if (chordSynthOptions.volume && chordSynthOptions.volume > this.maxVolume) {
-      chordSynthOptions.volume = this.maxVolume;
-    }
+    this.chordSynths = [];
     this.chordMeter = new this.Tone.Meter(meterOptions);
-    this.chordSynth = new this.Tone.PolySynth(this.Tone.FMSynth, chordSynthOptions).toDestination();
-    //console.log(this.chordSynth);
-    this.chordSynth.connect(this.chordMeter);
+    for (let i = 0; i < chordSynthsOptions.length; i++) {
+      const chordSynthOptions = chordSynthsOptions[i];
+      if (chordSynthOptions.volume && chordSynthOptions.volume > this.maxVolume) {
+        chordSynthOptions.volume = this.maxVolume;
+      }
+      this.chordSynths[i] = new this.Tone.PolySynth(this.Tone.FMSynth, chordSynthOptions).toDestination();
+      this.chordSynths[i].connect(this.chordMeter);
+    }
     this.chordMidis = [];
 
     this.Tone.Transport.bpm.value = this.bpm;
@@ -90,7 +101,7 @@ class SoundManager {
         const melodyMidi = this.melodyMidis[this.melodyMidiIndex];
         const melodyNote = this.Tone.Frequency(melodyMidi, "midi");
         const melodyNoteDuration = intervalDuration;
-        this.melodySynth.triggerAttackRelease(melodyNote, melodyNoteDuration, time);
+        this.melodySynths[this.mode].triggerAttackRelease(melodyNote, melodyNoteDuration, time);
       }
 
       // play chord
@@ -102,15 +113,23 @@ class SoundManager {
         const chordNotes = chordMidiArray.map((chordMidi) => this.Tone.Frequency(chordMidi, "midi"));
         //console.log(chordMidi);
         const chordNoteDuration = intervalDuration * timeSignature;
-        this.chordSynth.triggerAttackRelease(chordNotes, chordNoteDuration, time);
+        this.chordSynths[this.mode].triggerAttackRelease(chordNotes, chordNoteDuration, time);
       }
     }, interval);
   }
 
-  update(categorizedCoords, bpmDiffFactor) {
+  // [ ] Use object as input?
+  update(categorizedCoords, relativeAverageCoord, bpmDiffFactor) {
     this.destBpm = Math.floor(this.bpm + this.bpmDiffAmplitude * bpmDiffFactor);
     this.destBpm = Math.min(this.maxBpm, this.destBpm);
     this.categorizedCoords = categorizedCoords;
+
+    if (this.mode === 1 && relativeAverageCoord.x < this.modeThreshold - this.modeThresholdHysteresis) {
+      this.mode = 0;
+    } else if (this.mode !== 1 && relativeAverageCoord.x > this.modeThreshold + this.modeThresholdHysteresis) {
+      this.mode = 1;
+    }
+
     for (const [bodyIndex, bodyCoords] of this.categorizedCoords.entries()) {
       for (const [category, coords] of Object.entries(bodyCoords)) {
         if (category === "melody") {
@@ -179,6 +198,10 @@ class SoundManager {
 
   getBpmValue() {
     return this.Tone.Transport.bpm.value;
+  }
+
+  getMode() {
+    return this.mode;
   }
 
   mousePressed() {

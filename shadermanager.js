@@ -1,9 +1,6 @@
 class ShaderManager {
   constructor() {
     this.loopProgress = 0;
-    this.mode = 0;
-    this.modeThreshold = 0;
-    this.modeThresholdHysteresis = 0.02;
   }
 
   preload(loadShader, options) {
@@ -25,14 +22,8 @@ class ShaderManager {
     const colorDepth = options?.colorDepth ?? 8;
     const bodyCoords = options?.bodyCoords ?? [];
     const drumMeterValue = options?.drumMeterValue ?? 0;
-    const relativeAverageCoord = options?.relativeAverageCoord ?? { x: 0, y: 0 };
+    const mode = options?.mode ?? 0;
     const texture = options?.texture;
-
-    if (this.mode === 1 && relativeAverageCoord.x < this.modeThreshold - this.modeThresholdHysteresis) {
-      this.mode = 0;
-    } else if (this.mode !== 1 && relativeAverageCoord.x > this.modeThreshold + this.modeThresholdHysteresis) {
-      this.mode = 1;
-    }
 
     this.loopProgress += bpm / 100000;
     this.loopProgress = this.loopProgress - Math.floor(this.loopProgress);
@@ -46,7 +37,7 @@ class ShaderManager {
     this.shader.setUniform("uColorDepth", colorDepth);
     this.shader.setUniform("uPixelationShortNum", pixelationShortNum);
     this.shader.setUniform("uBodyCoords", bodyCoords);
-    this.shader.setUniform("uMode", this.mode);
+    this.shader.setUniform("uMode", mode);
   }
 
   draw(p = this.g) {
