@@ -32,22 +32,39 @@ const sketch = (p) => {
     },
     sound: {
       tone: Tone,
-      preload: {
-        rhythmPlayers: {
-          urls: {
-            "rim-shot": "assets/RS.mp3",
-            "mid-conga": "assets/MC00.mp3",
-            "mid-tom": "assets/MT00.mp3",
-          },
-          volume: -16,
-        },
-      },
+      preload: {},
       setup: {
         meter: {
           smoothing: 0.95,
           normalRange: true,
           channels: 1,
         },
+        rhythmSequence: [[0], [], [0], [], [0], [0], [], [0], [], [0], [], [0]],
+        rhythmFrequency: 300,
+        rhythmSynths: [
+          {
+            type: "MembraneSynth",
+            volume: -24,
+            oscillator: {},
+            envelope: {
+              attack: 0.0,
+              decay: 0.402,
+              sustain: 0.0,
+              release: 0.4,
+            },
+          },
+          {
+            type: "MetalSynth",
+            volume: -16,
+            modulationIndex: 0.5,
+            envelope: {
+              attack: 0.0,
+              decay: 0.352,
+              sustain: 0.0,
+              release: 0.35,
+            },
+          },
+        ],
         // https://tonejs.github.io/docs/14.7.77/interface/FMSynthOptions
         chordSynths: [
           {
@@ -128,10 +145,10 @@ const sketch = (p) => {
           },
         ],
         bpmDiffAmplitude: 12000,
-        bpm: 80,
-        maxBpm: 400,
+        bpm: 40,
+        maxBpm: 200,
         timeSignature: 4,
-        interval: "4n",
+        interval: "8n",
         minMidi: 12,
         maxMidi: 96,
         melodyCenterMidi: 65,

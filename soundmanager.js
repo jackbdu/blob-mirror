@@ -12,13 +12,6 @@ class SoundManager {
   }
 
   preload(options) {
-    const rhythmPlayersOptions = options?.rhythmPlayers ?? {};
-    if (rhythmPlayersOptions.volume && rhythmPlayersOptions.volume > this.maxVolume) {
-      rhythmPlayersOptions.volume = this.maxVolume;
-    }
-    const rhythmUrls = rhythmPlayersOptions.urls ?? {};
-    this.rhythmPlayers = new this.Tone.Players(rhythmPlayersOptions);
-    this.rhythmNames = Object.keys(rhythmUrls);
     this.Tone.loaded().then(() => {
       this.loaded = true;
     });
@@ -26,6 +19,7 @@ class SoundManager {
 
   setup(options) {
     const meterOptions = options?.meter ?? {};
+    const rhythmSynthsOptions = options?.rhythmSynths ?? {};
     const melodySynthsOptions = options?.melodySynths ?? {};
     const chordSynthsOptions = options?.chordSynths ?? {};
     const interval = options?.interval ?? "8n";
@@ -35,6 +29,8 @@ class SoundManager {
     this.maxBpm = options?.maxBpm ?? 300;
     this.destBpm = this.bpm;
     this.bpmDiffAmplitude = options?.bpmDiffAmplitude ?? 20;
+    this.rhythmSequence = options?.rhythmSequence ?? [];
+    this.rhythmFrequency = options?.rhythmFrequency ?? 200;
     this.melodyCenterMidi = options?.melodyCenterMidi ?? 60;
     this.chordCenterMidi = options?.chordCenterMidi ?? 50;
     this.chordMidiArrayOffsets = options?.chordMidiArrayOffsets ?? [0, 2, 4, 6];
@@ -44,9 +40,17 @@ class SoundManager {
     this.verticalSemitonesNum = options?.verticalSemitonesNum ?? 12;
 
     // rhythm
+    this.rhythmSynths = [];
     this.rhythmMeter = new this.Tone.Meter(meterOptions);
-    this.rhythmPlayers.toDestination();
-    this.rhythmPlayers.connect(this.rhythmMeter);
+    for (let i = 0; i < rhythmSynthsOptions.length; i++) {
+      const rhythmSynthOptions = rhythmSynthsOptions[i];
+      const rhythmSynthType = rhythmSynthOptions.type ?? "MembraneSynth";
+      if (rhythmSynthOptions.volume && rhythmSynthOptions.volume > this.maxVolume) {
+        rhythmSynthOptions.volume = this.maxVolume;
+      }
+      this.rhythmSynths[i] = new this.Tone[rhythmSynthType](rhythmSynthOptions).toDestination();
+      this.rhythmSynths[i].connect(this.rhythmMeter);
+    }
 
     // melody
     this.melodySynths = [];
@@ -86,14 +90,16 @@ class SoundManager {
       const barsBeatsSixteens = this.Tone.Transport.position.split(":");
       const bar = parseInt(barsBeatsSixteens[0]);
       const beat = parseInt(barsBeatsSixteens[1]);
-      // todos
-      // [] algorithmically generate beats
-      for (let i = 0; i < this.rhythmNames.length; i++) {
-        if (bar % i === 0 || beat % 4 === 3) {
-          this.rhythmPlayers.player(this.rhythmNames[i]).start(time);
-        }
-      }
+
       const intervalDuration = this.Tone.Time(interval);
+
+      const beatCount = bar * timeSignature + beat;
+      const rhythmSequenceIndex = beatCount % this.rhythmSequence.length;
+      const activeRhythmSynthIndices = this.rhythmSequence[rhythmSequenceIndex];
+      for (const index of activeRhythmSynthIndices) {
+        this.rhythmSynths[index].triggerAttackRelease(this.rhythmFrequency, intervalDuration, time);
+      }
+
       // play melody
       if (this.melodyMidis.length) {
         //this.melodyMidiIndex = ((bar % 2) * 2 + Math.floor(beat / 2)) % this.melodyMidis.length;
@@ -101,7 +107,7 @@ class SoundManager {
         const melodyMidi = this.melodyMidis[this.melodyMidiIndex];
         const melodyNote = this.Tone.Frequency(melodyMidi, "midi");
         const melodyNoteDuration = intervalDuration;
-        this.melodySynths[this.mode].triggerAttackRelease(melodyNote, melodyNoteDuration, time);
+        this.melodySynths[this.mode % this.melodySynths.length].triggerAttackRelease(melodyNote, melodyNoteDuration, time);
       }
 
       // play chord
@@ -113,7 +119,7 @@ class SoundManager {
         const chordNotes = chordMidiArray.map((chordMidi) => this.Tone.Frequency(chordMidi, "midi"));
         //console.log(chordMidi);
         const chordNoteDuration = intervalDuration * timeSignature;
-        this.chordSynths[this.mode].triggerAttackRelease(chordNotes, chordNoteDuration, time);
+        this.chordSynths[this.mode % this.chordSynths.length].triggerAttackRelease(chordNotes, chordNoteDuration, time);
       }
     }, interval);
   }
