@@ -45,7 +45,7 @@ vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_
   //const float intensityFactor = 50.0;
 
   const float overallOffset = -1.1;
-  const float intensityFactor = 8.0;
+  const float intensityFactor = 10.0;
   const float partialIntensityFactor1 = 42.0;
   const float partialIntensityFactor2 = 16.0;
   float shortSide = min(resolution.x, resolution.y);
