@@ -37,25 +37,36 @@ vec4 toColorDepth(vec4 inColor, float colorDepth) {
 
 vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM]) {
   // glowing
-  const float overallOffset = -4.0;
+  //const float overallOffset = -4.0;
+  //const float intensityFactor = 1.0;
+  //const float partialIntensityFactor = 4.0;
+
+  //const float overallOffset = -1.0;
+  //const float intensityFactor = 50.0;
+
+  const float overallOffset = -1.1;
+  const float intensityFactor = 8.0;
+  const float partialIntensityFactor1 = 42.0;
+  const float partialIntensityFactor2 = 16.0;
   float shortSide = min(resolution.x, resolution.y);
   
   vec4 outColor = vec4(0.0);
   for (int i = 0; i < BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM; i += BODY_COORD_LENGTH) {
     float x = bodyCoords[i];
     float y = bodyCoords[i+1];
-    float intensity = 1.0/bodyCoords[i+2];
+    float intensity = 1.0/bodyCoords[i+2]*intensityFactor;
     float meterValue = bodyCoords[i+3];
     float category = bodyCoords[i+4];
     vec2 bodyCoord = vec2(x + 0.5, 0.5 - y);
     vec2 scaledBodyCoord = bodyCoord * resolution;
     float distanceToBodyCoord = distance(scaledBodyCoord, gl_FragCoord.xy)/shortSide;
-    float partialIntensityOffset = -meterValue*4.0;
     if (category == 0.0) {
       distanceToBodyCoord -= meterValue/1.0;
     } else if (category == 1.0) {
+      float partialIntensityOffset = -meterValue*partialIntensityFactor1;
       outColor.rg += pow(1.0/distanceToBodyCoord,1.0/(intensity+partialIntensityOffset)) + overallOffset;
     } else if (category == 2.0) {
+      float partialIntensityOffset = -meterValue*partialIntensityFactor2;
       outColor.gb += pow(1.0/distanceToBodyCoord,1.0/(intensity+partialIntensityOffset)) + overallOffset;
     }
     outColor.rgb += pow(1.0/distanceToBodyCoord,1.0/(intensity)) + overallOffset;
