@@ -9,6 +9,7 @@ class SoundManager {
     this.mode = 0;
     this.modeThreshold = 0;
     this.modeThresholdHysteresis = 0.02;
+    this._latestStartTime = 0;
   }
 
   preload(options) {
@@ -83,7 +84,7 @@ class SoundManager {
     this.Tone.Transport.scheduleRepeat((time) => {
       if (this.destBpm !== this.Tone.Transport.bpm.value) {
         const rampTime = this.smoothness;
-        this.Tone.Transport.bpm.rampTo(this.destBpm, rampTime, time);
+        this.Tone.Transport.bpm.rampTo(this.destBpm, rampTime, this.latestStartTime);
         //console.log(this.Tone.Transport.bpm.value);
       }
 
@@ -97,7 +98,7 @@ class SoundManager {
       const rhythmSequenceIndex = beatCount % this.rhythmSequence.length;
       const activeRhythmSynthIndices = this.rhythmSequence[rhythmSequenceIndex];
       for (const index of activeRhythmSynthIndices) {
-        this.rhythmSynths[index].triggerAttackRelease(this.rhythmFrequency, intervalDuration, time);
+        this.rhythmSynths[index].triggerAttackRelease(this.rhythmFrequency, intervalDuration, this.latestStartTime);
       }
 
       // play melody
@@ -107,7 +108,7 @@ class SoundManager {
         const melodyMidi = this.melodyMidis[this.melodyMidiIndex];
         const melodyNote = this.Tone.Frequency(melodyMidi, "midi");
         const melodyNoteDuration = intervalDuration;
-        this.melodySynths[this.mode % this.melodySynths.length].triggerAttackRelease(melodyNote, melodyNoteDuration, time);
+        this.melodySynths[this.mode % this.melodySynths.length].triggerAttackRelease(melodyNote, melodyNoteDuration, this.latestStartTime);
       }
 
       // play chord
@@ -119,9 +120,20 @@ class SoundManager {
         const chordNotes = chordMidiArray.map((chordMidi) => this.Tone.Frequency(chordMidi, "midi"));
         //console.log(chordMidi);
         const chordNoteDuration = intervalDuration * timeSignature;
-        this.chordSynths[this.mode % this.chordSynths.length].triggerAttackRelease(chordNotes, chordNoteDuration, time);
+        this.chordSynths[this.mode % this.chordSynths.length].triggerAttackRelease(chordNotes, chordNoteDuration, this.latestStartTime);
       }
     }, interval);
+  }
+
+  // manually managing time to avoid fatal error
+  get latestStartTime() {
+    const now = this.Tone.now();
+    if (this._latestStartTime < now) {
+      this._latestStartTime = now;
+    } else {
+      this._latestStartTime += 0.001;
+    }
+    return this._latestStartTime;
   }
 
   // [ ] Use object as input?
