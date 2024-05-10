@@ -35,19 +35,9 @@ vec4 toColorDepth(vec4 inColor, float colorDepth) {
   return outColor;
 }
 
-vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM]) {
+vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_NUM*BODY_COORD_LENGTH*BODIES_NUM], float overallOffset, float intensityFactor, float partialIntensityFactor1, float partialIntensityFactor2) {
   // glowing
-  //const float overallOffset = -4.0;
-  //const float intensityFactor = 1.0;
-  //const float partialIntensityFactor = 4.0;
 
-  //const float overallOffset = -1.0;
-  //const float intensityFactor = 50.0;
-
-  const float overallOffset = -1.1;
-  const float intensityFactor = 10.0;
-  const float partialIntensityFactor1 = 42.0;
-  const float partialIntensityFactor2 = 16.0;
   float shortSide = min(resolution.x, resolution.y);
   
   vec4 outColor = vec4(0.0);
@@ -55,7 +45,7 @@ vec4 addGlowingBody(vec4 inColor, vec2 resolution, float bodyCoords[BODY_COORDS_
     float x = bodyCoords[i];
     float y = bodyCoords[i+1];
     float intensity = 1.0/bodyCoords[i+2]*intensityFactor;
-    float meterValue = bodyCoords[i+3];
+    float meterValue = bodyCoords[i+3]/2.0;
     float category = bodyCoords[i+4];
     vec2 bodyCoord = vec2(x + 0.5, 0.5 - y);
     vec2 scaledBodyCoord = bodyCoord * resolution;
@@ -108,18 +98,42 @@ void main()
   // outColor = texture2D(uTexMap, vTexCoord);
   // outColor.rgb /= 16.0;
   
-  outColor = addGlowingBody(outColor, uResolution * float(uPixelDensity), uBodyCoords);
+  if (uMode == 0) {
+    const float overallOffset = -4.0;
+    const float intensityFactor = 1.0;
+    const float partialIntensityFactor1 = 4.0;
+    const float partialIntensityFactor2 = 4.0;
 
-  outColor = colorFilter(outColor);
-  
-  if (uMode != 0) {
+  //const float overallOffset = -1.0;
+  //const float intensityFactor = 50.0;
+
+  //const float overallOffset = -1.1;
+  //const float intensityFactor = 10.0;
+  //const float partialIntensityFactor1 = 42.0;
+  //const float partialIntensityFactor2 = 16.0;
+
+  //const float overallOffset = -0.985;
+  //const float intensityFactor = 100.0;
+    //const float partialIntensityFactor1 = 500.0;
+    //const float partialIntensityFactor2 = 400.0;
+
+    outColor = addGlowingBody(outColor, uResolution * float(uPixelDensity), uBodyCoords, overallOffset, intensityFactor, partialIntensityFactor1, partialIntensityFactor2);
+    outColor = colorFilter(outColor);
+  } else {
+    const float overallOffset = -1.1;
+    const float intensityFactor = 8.0;
+    const float partialIntensityFactor1 = 42.0;
+    const float partialIntensityFactor2 = 16.0;
+
+    outColor = addGlowingBody(outColor, uResolution * float(uPixelDensity), uBodyCoords, overallOffset, intensityFactor, partialIntensityFactor1, partialIntensityFactor2);
+    outColor = colorFilter(outColor);
     outColor = invertColor(outColor);
+
+    //outColor = offsetColor(outColor, uMode*1.0);
+
+    //outColor = toLuminance(outColor);
+    //outColor = toColorDepth(outColor, float(uColorDepth));
   }
-
-  //outColor = offsetColor(outColor, uMode*1.0);
-
-  // outColor = toLuminance(outColor);
-  //outColor = toColorDepth(outColor, float(uColorDepth));
 
   gl_FragColor = outColor;
 }
