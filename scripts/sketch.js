@@ -322,8 +322,10 @@ const sketch = (p) => {
       console.error(e);
       if (p.specs.exhibit) window.location.reload();
     }
-    p.uiManager.display(p);
-    p.ml5Manager.display(p);
+    if (!p.specs.exhibit) {
+      p.uiManager.display(p);
+      p.ml5Manager.display(p);
+    }
   };
 
   p.mousePressed = (event) => {
