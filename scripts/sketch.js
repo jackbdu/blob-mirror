@@ -274,6 +274,7 @@ const sketch = (p) => {
     if (p.specs.exhibit) {
       p.soundManager.mousePressed();
 
+      p.noCursor();
       // global error handling
       window.addEventListener("error", function (event) {
         console.error("Caught in window:", event, event.message);
