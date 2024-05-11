@@ -271,7 +271,15 @@ const sketch = (p) => {
     };
     p.ml5Manager.setup(p.width, p.height, ml5SetupOptions);
 
-    if (p.specs.exhibit) p.soundManager.mousePressed();
+    if (p.specs.exhibit) {
+      p.soundManager.mousePressed();
+
+      // global error handling
+      window.addEventListener("error", function (event) {
+        console.error("Caught in window:", event, event.message);
+        window.location.reload();
+      });
+    }
   };
 
   p.myUpdate = () => {
