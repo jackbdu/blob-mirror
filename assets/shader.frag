@@ -121,7 +121,7 @@ void main()
     outColor = colorFilter(outColor);
   } else {
     const float overallOffset = -1.1;
-    const float intensityFactor = 8.0;
+    const float intensityFactor = 10.0;
     const float partialIntensityFactor1 = 42.0;
     const float partialIntensityFactor2 = 16.0;
 
