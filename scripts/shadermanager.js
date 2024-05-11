@@ -67,6 +67,6 @@ class ShaderManager {
   }
 
   canvasResized(canvasWidth, canvasHeight) {
-    this.g.resizeCanvas(canvasWidth, canvasHeight);
+    if (this.g) this.g.resizeCanvas(canvasWidth, canvasHeight);
   }
 }

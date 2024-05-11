@@ -307,7 +307,12 @@ const sketch = (p) => {
 
   p.myDraw = () => {
     p.background(p.options.visuals.backgroundColor);
-    p.shaderManager.draw(p);
+    try {
+      p.shaderManager.draw(p);
+    } catch (e) {
+      console.error(e);
+      if (p.specs.exhibit) window.location.reload();
+    }
     p.uiManager.display(p);
     p.ml5Manager.display(p);
   };
