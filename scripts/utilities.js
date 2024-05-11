@@ -12,6 +12,7 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
 });
 if (params.width && parseInt(params.width) > 0) p5sketch.specs.outputWidth = params.width;
 if (params.height && parseInt(params.height) > 0) p5sketch.specs.outputHeight = params.height;
+if (params.exhibit) p5sketch.specs.exhibit = params.exhibit === "true";
 
 // data.GUI
 // p5sketch.gui = new dat.GUI();

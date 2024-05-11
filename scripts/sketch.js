@@ -270,6 +270,8 @@ const sketch = (p) => {
       graphics: p.mediaManager.graphics,
     };
     p.ml5Manager.setup(p.width, p.height, ml5SetupOptions);
+
+    if (p.specs.exhibit) p.soundManager.mousePressed();
   };
 
   p.myUpdate = () => {
@@ -311,7 +313,7 @@ const sketch = (p) => {
   };
 
   p.mousePressed = (event) => {
-    p.soundManager.mousePressed(event);
+    p.soundManager.mousePressed();
     // p.uiManager.mousePressed(event);
   };
 
