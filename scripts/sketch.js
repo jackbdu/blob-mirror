@@ -21,6 +21,11 @@ const sketch = (p) => {
   };
 
   p.options = {
+    exhibit: {
+      reloadErrorCount: 8,
+      reloadTotalMillis: 600000,
+      reloadAbsenceMillis: 10000,
+    },
     visuals: {
       size: 0.2,
       backgroundColor: "#000",
@@ -266,8 +271,15 @@ const sketch = (p) => {
       p.noCursor();
       // global error handling
       window.addEventListener("error", function (event) {
-        console.error("Caught in window:", event, event.message);
-        window.location.reload();
+        console.warn("Caught in window:", event, event.message);
+        if (!p.errorCount) {
+          p.errorCount = 1;
+        } else {
+          p.errorCount++;
+        }
+        if (p.errorCount > p.options.exhibit.reloadErrorCount) {
+          window.location.reload();
+        }
       });
     }
   };
@@ -308,10 +320,22 @@ const sketch = (p) => {
     try {
       p.shaderManager.draw(p);
     } catch (e) {
-      console.error(e);
+      console.warn(e);
       if (p.specs.exhibit) window.location.reload();
     }
-    if (!p.specs.exhibit) {
+    if (p.specs.exhibit) {
+      const millis = p.millis();
+      if (millis > p.options.exhibit.reloadTotalMillis && !p.ml5Manager.hasDetectedBodies()) {
+        if (!p.absenceMillis) {
+          p.absenceMillis = millis;
+        }
+        if (millis - p.absenceMillis > p.options.exhibit.reloadAbsenceMillis) {
+          window.location.reload();
+        }
+      } else {
+        p.absenceMillis = undefined;
+      }
+    } else {
       p.uiManager.display(p);
       p.ml5Manager.display(p);
     }

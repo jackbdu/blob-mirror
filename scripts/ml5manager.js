@@ -34,6 +34,7 @@ class Ml5Manager {
     const bodyPoseOptions = options?.bodyPose ?? {};
     const modelName = options?.modelName ?? "MoveNet";
     this.canvasResized(canvasWidth, canvasHeight);
+    this.detectedBodies = [];
     this.bodies = [];
     this.pbodies = [];
     this.movementScores = [0];
@@ -128,6 +129,7 @@ class Ml5Manager {
   }
 
   updateBodies(bodies) {
+    this.detectedBodies = bodies;
     if (bodies.length < 1) {
       // const placeholderBodies = this.placeholderBodies.getNextFrame();
       bodies = JSON.parse(JSON.stringify(this.placeholderBodies));
@@ -342,6 +344,10 @@ class Ml5Manager {
   canvasResized(canvasWidth, canvasHeight) {
     const canvasShort = p5sketch.min(canvasWidth, canvasHeight);
     this.refSize = canvasShort;
+  }
+
+  hasDetectedBodies() {
+    return this.detectedBodies.length > 0;
   }
 
   // recording bodies for loading as placeholder later
