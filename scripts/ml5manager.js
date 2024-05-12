@@ -115,12 +115,12 @@ class Ml5Manager {
         normalizedBody.keypoints.push(normalizedKeypoint);
       }
       // this is not necessary as box is recaculated in smoothBodies()
-      // normalizedBody.box["xMin"] = body.box["xMin"] / realWidth - 0.5;
-      // normalizedBody.box["xMax"] = body.box["xMax"] / realWidth - 0.5;
-      // normalizedBody.box["yMin"] = body.box["yMin"] / realHeight - 0.5;
-      // normalizedBody.box["yMax"] = body.box["yMax"] / realHeight - 0.5;
-      // normalizedBody.box["width"] = body.box["width"] / realWidth;
-      // normalizedBody.box["height"] = body.box["height"] / realHeight;
+      normalizedBody.box["xMin"] = body.box["xMin"] / realWidth - 0.5;
+      normalizedBody.box["xMax"] = body.box["xMax"] / realWidth - 0.5;
+      normalizedBody.box["yMin"] = body.box["yMin"] / realHeight - 0.5;
+      normalizedBody.box["yMax"] = body.box["yMax"] / realHeight - 0.5;
+      normalizedBody.box["width"] = body.box["width"] / realWidth;
+      normalizedBody.box["height"] = body.box["height"] / realHeight;
       normalizedBodies.push(normalizedBody);
       //console.log(realHeight, body.box["height"]);
     }
