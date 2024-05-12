@@ -156,6 +156,7 @@ const sketch = (p) => {
         chordMidiArrayOffsets: [0, 2, 5],
         horizontalSemitonesNum: 36,
         verticalSemitonesNum: 24,
+        modeThresholdHysteresis: 0.03,
       },
     },
     shader: {

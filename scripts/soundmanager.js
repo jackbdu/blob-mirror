@@ -8,7 +8,6 @@ class SoundManager {
 
     this.mode = 0;
     this.modeThreshold = 0;
-    this.modeThresholdHysteresis = 0.02;
     this._latestStartTime = 0;
   }
 
@@ -39,6 +38,7 @@ class SoundManager {
     this.maxMidi = options?.maxMidi ?? 127;
     this.horizontalSemitonesNum = options?.horizontalSemitonesNum ?? 12;
     this.verticalSemitonesNum = options?.verticalSemitonesNum ?? 12;
+    this.modeThresholdHysteresis = options?.modeThresholdHysteresis ?? 0.02;
 
     // rhythm
     this.rhythmSynths = [];
