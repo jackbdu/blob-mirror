@@ -100,8 +100,8 @@ void main()
     
   const float overallOffset = -4.0;
   const float intensityFactor = 1.0;
-  const float partialIntensityFactor1 = 4.0;
-  const float partialIntensityFactor2 = 4.0;
+  const float partialIntensityFactor1 = 5.0;
+  const float partialIntensityFactor2 = 5.0;
   
   if (uMode == 0) {
 
