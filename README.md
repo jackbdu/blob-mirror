@@ -1,3 +1,11 @@
 # Blob Mirror
 
-Blob Mirror is an interactive audio-visual installation that transforms the presence of viewers into dynamically morphing blobs, while simultaneously synthesizing melodies that respond to their movements. This installation invites participants to engage actively and become part of the artwork, exploring the playful interplay between visual art and music. It offers an immersive experience where every interaction shapes the visual and auditory outcomes, making each encounter uniquely personal.
+Title: Blob Mirror
+
+Date: 2024
+
+Mediums: computer, camera, custom software (written in JavaScript and GLSL)
+
+Dimensions: variable
+
+Blob Mirror is an interactive audio-visual installation that transforms the presence of viewers into breathing, musical blobs. When left alone, the blobs float freely across the virtual space, creating soothing, otherworldly melodies. As soon as a viewer engages with the installation, the blobs gather and respond to their movements. Through active participation, viewers become part of the artwork, forming a poetic experience that is unique for each person.
